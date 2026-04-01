@@ -19,8 +19,8 @@ Clone the repository.
 Make sure the scripts are executable:
 
 ```bash
-git clone git@github.com:fieldghost/Cronically.git
-cd Cronically/scripts
+git clone git@github.com:fieldghost/Chronically.git
+cd Chronically/scripts
 chmod +x autocron.sh executecron.sh
 ```
 
