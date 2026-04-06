@@ -2,23 +2,26 @@
 
 > "Because I keep forgetting the god damn command to use crontab."
 
-**Chronically** is a pure Bash CLI tool designed to simplify scheduling automated tasks and backups. It acts as an interactive wrapper around `cron`, allowing you to schedule jobs using plain time formats (like `14:00`) instead of trying to remember if the asterisk goes in the minute, hour, or day column.
+**Chronically** is a pure Bash CLI tool designed to simplify system administration, file management, and automated backups. It acts as an interactive wrapper around `cron`, allowing you to schedule jobs using plain time formats (like `14:00`), securely manage files, and update your system—all without having to memorize complex syntax.
 
 🔗 **[View on GitHub](https://github.com/fieldghost/Chronically)**
 
 ---
 
-## ✨ Features
+## Features
 
-* **Interactive CLI:** Forget an argument? No problem. The script will dynamically prompt you for missing paths and timestamps.
-* **Human-Readable Time:** Schedule jobs using a standard `HH:MM` format.
-* **Safe Scheduling:** Seamlessly appends new jobs to your crontab without overwriting your existing entries.
-* **Automated Backups:** Uses `tar` to quietly compress and back up specified directories, tagging the filename with the current day of the week.
-* *(Coming Soon)*: Skeletons are in place for system updates, upgrades, and file manipulation scheduling.
+* **Interactive CLI & Menu:** Run the script without arguments to get a full interactive menu. Forget a parameter? The script will dynamically prompt you for missing paths, timestamps, or multi-line text input.
+* **Non-Interactive Mode:** Use the `--non-interactive` flag to bypass all prompts and fail-fast, making it perfectly suited for CI/CD pipelines or headless automation.
+* **Human-Readable Scheduling:** Schedule backup and archive jobs using a standard `HH:MM` format. 
+* **Smart Cron Deduplication:** Seamlessly appends new jobs to your crontab. The engine hashes your jobs and tags them (e.g., `# autocron:hash`), preventing duplicate entries and preventing crontab spam.
+* **Automated Backups & Archives:** Uses `tar` to quietly compress and back up specified directories, safely tagging the filename with the dynamic day of the week to allow for proper rotation.
+* **Universal System Updates:** Auto-detects your system's package manager (`apt`, `pacman`, `dnf`, `yum`, `zypper`, `apk`, `xbps`, `emerge`, `nix`, or `brew`) to update and upgrade your system gracefully.
+* **Secure File Management:** Create, append/overwrite (with multi-line support), and delete files safely. Includes hardcoded guardrails that refuse to delete critical system directories (like `/bin`, `/etc`, `/var`, or `/`).
+* **Security-First Design:** Features strict POSIX-compliant quoting to eliminate command injection risks and a smart `run_privileged` wrapper that intelligently handles `sudo` prompts depending on the user's EUID and interaction mode.
 
 ---
 
-## 🛠️ Installation
+## Installation
 
 Clone the repository and make the scripts executable:
 
@@ -30,35 +33,45 @@ chmod +x autocron.sh executecron.sh
 
 ---
 
-## 💻 Usage
+## Usage
 
-You can run the script with all arguments inline, or just trigger the command and let the interactive prompts guide you.
+You can run the script via the main menu, with all arguments inline, or non-interactively.
+
+**Main Menu:**
+```bash
+./autocron.sh
+```
 
 **Inline execution:**
 ```bash
 ./autocron.sh backup /path/to/source /path/to/destination 14:00
 ```
+*(If you leave out an argument, the script will prompt you for the missing information).*
 
-**Interactive execution:**
+**Non-Interactive execution (Automation):**
 ```bash
-./autocron.sh backup
+./autocron.sh --non-interactive update
 ```
-*(The script will detect the missing arguments and prompt you for the source directory, destination directory, and time).*
 
-**Current supported commands:**
-* `backup` (Fully functional)
-* `archive`, `update`, `upgrade`, `file-create`, `file-update`, `file-delete` (Placeholders/WIP)
-
----
-
-## 🏗️ Architecture
-
-To keep things clean and modular, the tool is split into two components:
-* **`autocron.sh`**: The front-end interface. It handles user input, path validation (including expanding `~` to your home directory), and interactive prompts.
-* **`executecron.sh`**: The back-end engine. It takes the validated data, converts the timestamp into `cron` syntax, and safely injects the job into your system's crontab.
+**Supported commands:**
+* `backup` : Schedule a rotating tarball backup.
+* `archive` : Schedule a rotating tarball archive.
+* `update` : Refresh system package repositories.
+* `upgrade` : Upgrade installed system packages.
+* `file-create` : Safely create a new file and directory path.
+* `file-update` : Interactively overwrite or append multi-line content to a file.
+* `file-delete` : Delete a file (protected against system directory deletion).
 
 ---
 
-## 📄 License
+## Architecture
+
+To keep things clean, secure, and modular, the tool is split into two components:
+* **`autocron.sh`**: The front-end interface. It handles user input, path validation (including expanding `~` and stripping trailing slashes), smart privilege escalation, and interactive prompts.
+* **`executecron.sh`**: The back-end scheduling engine. It builds perfectly escaped shell strings, calculates stable job ID hashes for deduplication, and safely modifies your system's crontab without breaking existing entries.
+
+---
+
+## License
 
 This project is licensed under the MIT License.
