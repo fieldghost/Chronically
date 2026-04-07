@@ -40,7 +40,7 @@ install_cron_job () {
 
 	crontab -l 2>/dev/null > "$tempCron" || true
 
-	grep -vF "# autocron:${jobId}" "$tempCron" | grep -vF "$cronJob" > "${tempCron}.new" || true
+	grep -vF "# unicron:${jobId}" "$tempCron" | grep -vF "$cronJob" > "${tempCron}.new" || true
 	mv "${tempCron}.new" "$tempCron"
 
 	echo "$cronJob" >> "$tempCron"
@@ -63,7 +63,7 @@ schedule_tar_job () {
 	sourceDirQuoted="$(shell_single_quote "$SOURCE_DIR")"
 	cronCommand="tar czf ${destPrefixQuoted}"'$(date +\%A)'"'.tgz' ${sourceDirQuoted} >/dev/null 2>&1"
 	jobId="$(printf '%s' "${mode}|$SOURCE_DIR|$DESTINATION_DIR|$MINUTE|$HOUR" | hash_string)"
-	cronJob="$MINUTE $HOUR * * * $cronCommand # autocron:${jobId}"
+	cronJob="$MINUTE $HOUR * * * $cronCommand # unicron:${jobId}"
 
 	install_cron_job "$cronJob" "$jobId"
 }

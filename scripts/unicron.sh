@@ -13,12 +13,53 @@ COMMAND=""
 REST_ARGS=()
 
 print_usage () {
-	echo "Usage:"
-	echo "  autocron.sh                               # interactive menu"
-	echo "  autocron.sh <command> [args...]           # interactive (advanced)"
-	echo "  autocron.sh --non-interactive <command> [args...]  # no prompts; fail fast"
-	echo
-	echo "Commands: backup | archive | update | upgrade | file-create | file-update | file-delete"
+	local prog="${0##*/}"
+	cat <<EOF
+Unicron — $prog
+
+Pure Bash CLI to simplify cron scheduling, backups, file management, and system
+updates. Schedule with plain HH:MM; crontab entries are hashed and tagged to
+avoid duplicates.
+
+Features
+  • Interactive menu and prompts; missing arguments are requested as you go
+  • --non-interactive for CI/headless runs (no prompts; fail fast)
+  • Human-readable HH:MM scheduling; crontab deduplication (# unicron:hash)
+  • Backups/archives via tar with day-of-week filename rotation
+  • update/upgrade using auto-detected package manager (apt, pacman, dnf,
+    yum, zypper, apk, xbps, emerge, nix, brew, …)
+  • file-create, file-update (multi-line), file-delete with safety guardrails
+  • Strict quoting and smart privilege handling (sudo when needed)
+
+Installation
+  git clone git@github.com:fieldghost/unicron.git
+  cd unicron/scripts && chmod +x unicron.sh executecron.sh
+
+Usage
+  $prog                              Interactive main menu
+  $prog <command> [args ...]         Run a command (prompts if args missing)
+  $prog --non-interactive <cmd> [..] No prompts; unsatisfied input fails
+
+Examples
+  $prog
+  $prog backup /path/to/source /path/to/destination 14:00
+  $prog --non-interactive update
+
+Commands
+  backup       Schedule a rotating tarball backup
+  archive      Schedule a rotating tarball archive
+  update       Refresh system package repositories
+  upgrade      Upgrade installed packages
+  file-create  Create a file and parent directories
+  file-update  Overwrite or append (incl. multi-line) to a file
+  file-delete  Delete a file (refuses critical system paths)
+
+Architecture
+  unicron.sh      Front-end: input, path validation, privileges, prompts
+  executecron.sh  Back-end: escaped cron lines, job hashes, crontab edits
+
+License: MIT  •  https://github.com/fieldghost/unicron
+EOF
 }
 
 parse_args () {
@@ -523,7 +564,7 @@ task_file_delete () {
 
 show_menu () {
 	echo
-	echo "Autocron - choose an action:"
+	echo "Unicron - choose an action:"
 	echo "1) Backup (schedule)"
 	echo "2) Archive (schedule)"
 	echo "3) Update packages"
