@@ -1,7 +1,5 @@
 
-<img width="1408" height="768" alt="unicron" src="https://github.com/user-attachments/assets/79bf4ee7-b5f9-4220-9433-6b199aedb445" />
-
-*AI generated*
+<img width="642" height="829" alt="screenshot-2026-04-23_00-13-44" src="https://github.com/user-attachments/assets/1a217bb0-887c-49c4-9265-d2db11c533e3" />
 
 # Unicron
 
